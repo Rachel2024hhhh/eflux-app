@@ -24,7 +24,7 @@ export default function BottomBar() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 56,
+    height: S.bottomBarHeight,
     backgroundColor: C.panelLeftBg,
   },
   row: {
