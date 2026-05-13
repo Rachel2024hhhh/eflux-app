@@ -25,7 +25,7 @@ export default function BottomBar() {
 const styles = StyleSheet.create({
   container: {
     height: 56,
-    backgroundColor: C.efluxBlue,
+    backgroundColor: C.panelLeftBg,
   },
   row: {
     flex: 1,
@@ -40,10 +40,10 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   label: {
-    fontFamily: F.regular,
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.55)',
-    letterSpacing: 0.8,
+    fontFamily: F.medium,
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 1.4,
     textTransform: 'uppercase',
   },
 });

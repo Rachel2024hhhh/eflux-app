@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   wordmark: {
     fontFamily: F.display,
     fontSize: 28,
-    color: C.efluxBlue,
+    color: C.panelLeftBg,
     letterSpacing: -0.5,
     lineHeight: 32,
   },
@@ -43,13 +43,14 @@ const styles = StyleSheet.create({
   issue: {
     fontFamily: F.regular,
     fontSize: 10,
-    color: C.blueMid,
+    color: C.panelLeftBg,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
+    opacity: 0.7,
   },
   chevron: {
     fontSize: 14,
-    color: C.efluxBlue,
+    color: C.panelLeftBg,
     lineHeight: 16,
   },
   chevronOpen: {

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, ScrollView, StyleSheet } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
-import { C, S } from '../constants/theme';
-import TopHeader from '../components/TopHeader';
+import { C, S } from '../constants/theme';import TopHeader from '../components/TopHeader';
 import ArticleCard from '../components/ArticleCard';
 import GlassStrip from '../components/GlassStrip';
 import BottomBar from '../components/BottomBar';
@@ -50,13 +49,13 @@ export default function HomeScreen() {
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <Svg width={W} height={H}>
           {/* Top-left: diagonal seam from (0,0) to (STRIP,T) — blue fills below */}
-          <Polygon points={`0,0 0,${T} ${STRIP},${T}`} fill={C.efluxBlue} />
+          <Polygon points={`0,0 0,${T} ${STRIP},${T}`} fill={C.panelLeftBg} />
           {/* Top-right: mirror */}
-          <Polygon points={`${W},0 ${W},${T} ${W - STRIP},${T}`} fill={C.efluxBlue} />
+          <Polygon points={`${W},0 ${W},${T} ${W - STRIP},${T}`} fill={C.panelLeftBg} />
           {/* Bottom-left: diagonal seam from (0,H) to (STRIP,H-B) */}
-          <Polygon points={`0,${H} 0,${H - B} ${STRIP},${H - B}`} fill={C.efluxBlue} />
+          <Polygon points={`0,${H} 0,${H - B} ${STRIP},${H - B}`} fill={C.panelLeftBg} />
           {/* Bottom-right: mirror */}
-          <Polygon points={`${W},${H} ${W},${H - B} ${W - STRIP},${H - B}`} fill={C.efluxBlue} />
+          <Polygon points={`${W},${H} ${W},${H - B} ${W - STRIP},${H - B}`} fill={C.panelLeftBg} />
         </Svg>
       </View>
 
@@ -70,7 +69,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0d0d0d',
+    backgroundColor: C.panelLeftBg,
   },
   body: {
     flex: 1,

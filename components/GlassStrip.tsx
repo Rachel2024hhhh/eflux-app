@@ -9,6 +9,6 @@ export default function GlassStrip({ side }: { side: 'left' | 'right' }) {
 const styles = StyleSheet.create({
   strip: {
     width: S.sideStrip,
-    backgroundColor: C.efluxBlue,
+    backgroundColor: C.panelLeftBg,
   },
 });
