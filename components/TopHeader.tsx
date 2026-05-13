@@ -1,17 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { C, F } from '../constants/theme';
 import { ARTICLES } from '../constants/data';
 
 const featured = ARTICLES[0];
 
-export default function TopHeader() {
+interface Props {
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+export default function TopHeader({ isOpen, onToggle }: Props) {
   return (
-    <View style={styles.container}>
+    <Pressable onPress={onToggle} style={({ pressed }) => [styles.container, pressed && { opacity: 0.85 }]}>
       {/* Brand row */}
       <View style={styles.brandRow}>
         <Text style={styles.wordmark}>e&#8209;flux</Text>
-        <Text style={styles.issue}>Spring 2026 · Issue 142</Text>
+        <View style={styles.rightRow}>
+          <Text style={styles.issue}>Spring 2026 · Issue 142</Text>
+          <Text style={[styles.chevron, isOpen && styles.chevronOpen]}>▾</Text>
+        </View>
       </View>
       {/* Yellow accent bar */}
       <View style={styles.accentBar} />
@@ -23,7 +31,7 @@ export default function TopHeader() {
           {featured.artist}{featured.exhibition ? ` · ${featured.exhibition}` : ''}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -48,11 +56,24 @@ const styles = StyleSheet.create({
     color: C.efluxBlue,
     letterSpacing: -0.6,
   },
+  rightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   issue: {
     fontFamily: F.regular,
     fontSize: 11,
     color: C.textMuted,
     letterSpacing: 0.4,
+  },
+  chevron: {
+    fontSize: 16,
+    color: C.efluxBlue,
+    lineHeight: 18,
+  },
+  chevronOpen: {
+    transform: [{ rotate: '180deg' }],
   },
   accentBar: {
     height: 3,

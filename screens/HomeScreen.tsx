@@ -4,20 +4,16 @@ import { C } from '../constants/theme';
 import TopHeader from '../components/TopHeader';
 import ArticleCard from '../components/ArticleCard';
 import GlassStrip from '../components/GlassStrip';
-import BottomBar, { PanelContent } from '../components/BottomBar';
+import BottomBar from '../components/BottomBar';
 import GlassPanel from '../components/GlassPanel';
 import { ARTICLES } from '../constants/data';
 
 export default function HomeScreen() {
-  const [panel, setPanel] = useState<PanelContent>(null);
-
-  function toggle(id: Exclude<PanelContent, null>) {
-    setPanel((prev) => (prev === id ? null : id));
-  }
+  const [panelOpen, setPanelOpen] = useState(false);
 
   return (
     <SafeAreaView style={styles.root}>
-      <TopHeader />
+      <TopHeader isOpen={panelOpen} onToggle={() => setPanelOpen((v) => !v)} />
 
       <View style={styles.body}>
         <GlassStrip side="left" />
@@ -33,16 +29,10 @@ export default function HomeScreen() {
         <GlassStrip side="right" />
       </View>
 
-      <BottomBar
-        active={panel}
-        onFeed={() => setPanel(null)}
-        onBrowse={() => toggle('browse')}
-        onAbout={() => toggle('about')}
-        onInfo={() => toggle('info')}
-      />
+      <BottomBar />
 
-      {panel !== null && (
-        <GlassPanel content={panel} onClose={() => setPanel(null)} />
+      {panelOpen && (
+        <GlassPanel onClose={() => setPanelOpen(false)} />
       )}
     </SafeAreaView>
   );

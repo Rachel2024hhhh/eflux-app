@@ -27,7 +27,6 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PANEL_HEIGHT = SCREEN_HEIGHT * 0.82;
 
 interface Props {
-  content: 'browse' | 'about' | 'info';
   onClose: () => void;
 }
 
@@ -250,10 +249,11 @@ function InfoContent() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Main GlassPanel sheet
+// Main GlassPanel sheet — slides DOWN from top
 // ─────────────────────────────────────────────────────────────────────────────
-export default function GlassPanel({ content, onClose }: Props) {
-  const slideAnim = useRef(new Animated.Value(PANEL_HEIGHT)).current;
+export default function GlassPanel({ onClose }: Props) {
+  const [activeTab, setActiveTab] = useState<'browse' | 'about' | 'info'>('browse');
+  const slideAnim = useRef(new Animated.Value(-PANEL_HEIGHT)).current;
 
   useEffect(() => {
     Animated.spring(slideAnim, {
@@ -266,7 +266,7 @@ export default function GlassPanel({ content, onClose }: Props) {
 
   const close = () => {
     Animated.timing(slideAnim, {
-      toValue: PANEL_HEIGHT,
+      toValue: -PANEL_HEIGHT,
       duration: 260,
       useNativeDriver: true,
     }).start(onClose);
@@ -274,12 +274,12 @@ export default function GlassPanel({ content, onClose }: Props) {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => g.dy > 8 && Math.abs(g.dy) > Math.abs(g.dx),
+      onMoveShouldSetPanResponder: (_, g) => g.dy < -8 && Math.abs(g.dy) > Math.abs(g.dx),
       onPanResponderMove: (_, g) => {
-        if (g.dy > 0) slideAnim.setValue(g.dy);
+        if (g.dy < 0) slideAnim.setValue(g.dy);
       },
       onPanResponderRelease: (_, g) => {
-        if (g.dy > 110 || g.vy > 0.5) {
+        if (g.dy < -80 || g.vy < -0.5) {
           close();
         } else {
           Animated.spring(slideAnim, {
@@ -293,16 +293,10 @@ export default function GlassPanel({ content, onClose }: Props) {
     })
   ).current;
 
-  const TITLES: Record<string, string> = {
-    browse: 'Browse',
-    about: 'About',
-    info: 'Info',
-  };
-
   const panelContent =
-    content === 'browse' ? (
+    activeTab === 'browse' ? (
       <BrowseContent />
-    ) : content === 'about' ? (
+    ) : activeTab === 'about' ? (
       <AboutContent />
     ) : (
       <InfoContent />
@@ -313,14 +307,22 @@ export default function GlassPanel({ content, onClose }: Props) {
       {/* Glass overlay tint */}
       <View style={[StyleSheet.absoluteFill, styles.glassTint]} pointerEvents="none" />
 
-      {/* Drag handle */}
-      <View style={styles.handleArea} {...panResponder.panHandlers}>
-        <View style={styles.handle} />
-      </View>
-
       {/* Header */}
       <View style={styles.panelHeader}>
-        <Text style={styles.panelTitle}>{TITLES[content]}</Text>
+        <View style={styles.tabsRow}>
+          {(['browse', 'about', 'info'] as const).map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]}
+              onPress={() => setActiveTab(tab)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabLabel, activeTab === tab && styles.tabLabelActive]}>
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
         <TouchableOpacity style={styles.closeBtn} onPress={close} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Text style={styles.closeText}>✕</Text>
         </TouchableOpacity>
@@ -329,6 +331,11 @@ export default function GlassPanel({ content, onClose }: Props) {
       {/* Content */}
       <View style={styles.contentArea}>
         {panelContent}
+      </View>
+
+      {/* Drag handle at bottom */}
+      <View style={styles.handleArea} {...panResponder.panHandlers}>
+        <View style={styles.handle} />
       </View>
     </>
   );
@@ -353,26 +360,25 @@ export default function GlassPanel({ content, onClose }: Props) {
 const styles = StyleSheet.create({
   sheet: {
     position: 'absolute',
-    bottom: 0,
+    top: 0,
     left: 0,
     right: 0,
     height: PANEL_HEIGHT,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
     overflow: 'hidden',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: C.border,
-    // subtle shadow
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: C.border,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
     elevation: 24,
   },
   glassTint: {
     backgroundColor: 'rgba(255,255,255,0.55)',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
   },
   handleArea: {
     alignItems: 'center',
@@ -388,16 +394,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingBottom: 12,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 0,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: C.border,
   },
-  panelTitle: {
+  tabsRow: {
+    flexDirection: 'row',
+    gap: 4,
+    flex: 1,
+  },
+  tabBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabBtnActive: {
+    borderBottomColor: C.efluxBlue,
+  },
+  tabLabel: {
+    fontFamily: F.medium,
+    fontSize: 13,
+    color: C.textMid,
+    letterSpacing: 0.2,
+  },
+  tabLabelActive: {
+    color: C.efluxBlue,
     fontFamily: F.bold,
-    fontSize: 18,
-    color: C.textMain,
-    letterSpacing: -0.4,
   },
   closeBtn: {
     padding: 4,
