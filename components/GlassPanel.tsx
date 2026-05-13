@@ -10,10 +10,8 @@ import {
   Dimensions,
   PanResponder,
   TextInput,
-  Platform,
   Linking,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { C, F } from '../constants/theme';
 import {
   NAV_CONTENT,
@@ -325,8 +323,8 @@ export default function GlassPanel({ onClose }: Props) {
 
   const glassContent = (
     <>
-      {/* Glass overlay tint */}
-      <View style={[StyleSheet.absoluteFill, styles.glassTint]} pointerEvents="none" />
+      {/* Solid blue background */}
+      <View style={[StyleSheet.absoluteFill, styles.blueBg]} pointerEvents="none" />
 
       {/* IFLUX grow animation — matches desktop panelTextGrow: scale 1→9.5, opacity 0.2→1 */}
       <Animated.View
@@ -380,11 +378,6 @@ export default function GlassPanel({ onClose }: Props) {
     <Animated.View
       style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
     >
-      {Platform.OS === 'ios' ? (
-        <BlurView intensity={85} tint="extraLight" style={StyleSheet.absoluteFill} />
-      ) : (
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: C.bgMain + 'f4' }]} />
-      )}
       {glassContent}
     </Animated.View>
   );
@@ -400,21 +393,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: PANEL_HEIGHT,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
     overflow: 'hidden',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
     elevation: 24,
   },
-  glassTint: {
-    backgroundColor: 'rgba(255,255,255,0.55)',
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+  blueBg: {
+    backgroundColor: C.panelLeftBg,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
   },
   growLayer: {
     alignItems: 'center',
@@ -436,18 +423,18 @@ const styles = StyleSheet.create({
   handle: {
     width: 36,
     height: 4,
-    backgroundColor: C.border,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     borderRadius: 2,
   },
   panelHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingTop: 14,
+    paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 0,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
+    borderBottomColor: 'rgba(255,255,255,0.15)',
   },
   tabsRow: {
     flexDirection: 'row',
@@ -461,16 +448,17 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabBtnActive: {
-    borderBottomColor: C.efluxBlue,
+    borderBottomColor: C.yellow,
   },
   tabLabel: {
     fontFamily: F.medium,
     fontSize: 13,
-    color: C.textMid,
-    letterSpacing: 0.2,
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   tabLabelActive: {
-    color: C.efluxBlue,
+    color: C.yellow,
     fontFamily: F.bold,
   },
   closeBtn: {
@@ -479,7 +467,7 @@ const styles = StyleSheet.create({
   closeText: {
     fontFamily: F.regular,
     fontSize: 15,
-    color: C.textMid,
+    color: 'rgba(255,255,255,0.6)',
   },
   contentArea: {
     flex: 1,
@@ -494,11 +482,11 @@ const inner = StyleSheet.create({
   tabScroll: {
     flexGrow: 0,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
+    borderBottomColor: 'rgba(255,255,255,0.15)',
   },
   tabRow: {
     flexDirection: 'row',
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 0,
     gap: 4,
   },
@@ -509,16 +497,17 @@ const inner = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   sectionTabActive: {
-    borderBottomColor: C.efluxBlue,
+    borderBottomColor: C.yellow,
   },
   sectionLabel: {
     fontFamily: F.medium,
-    fontSize: 13,
-    color: C.textMid,
-    letterSpacing: 0.2,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   sectionLabelActive: {
-    color: C.efluxBlue,
+    color: C.yellow,
     fontFamily: F.bold,
   },
   list: {
@@ -530,7 +519,7 @@ const inner = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
+    borderBottomColor: 'rgba(255,255,255,0.12)',
     gap: 12,
   },
   dot: {
@@ -545,28 +534,28 @@ const inner = StyleSheet.create({
   navTitle: {
     fontFamily: F.bold,
     fontSize: 14,
-    color: C.textMain,
+    color: '#ffffff',
     letterSpacing: -0.2,
     marginBottom: 2,
   },
   navMeta: {
     fontFamily: F.regular,
     fontSize: 11,
-    color: C.textMuted,
+    color: C.yellow,
     letterSpacing: 0.2,
     marginBottom: 4,
   },
   navBodyText: {
     fontFamily: F.regular,
     fontSize: 13,
-    color: C.textLight,
+    color: 'rgba(255,255,255,0.65)',
     lineHeight: 18,
   },
   // About
   aboutTitle: {
     fontFamily: F.bold,
     fontSize: 22,
-    color: C.efluxBlue,
+    color: '#ffffff',
     letterSpacing: -0.5,
     marginBottom: 12,
     marginTop: 8,
@@ -574,7 +563,7 @@ const inner = StyleSheet.create({
   aboutBody: {
     fontFamily: F.regular,
     fontSize: 14,
-    color: C.textMid,
+    color: 'rgba(255,255,255,0.75)',
     lineHeight: 21,
     marginBottom: 12,
   },
@@ -594,49 +583,50 @@ const inner = StyleSheet.create({
   statNum: {
     fontFamily: F.bold,
     fontSize: 18,
-    color: C.efluxBlue,
+    color: '#ffffff',
     letterSpacing: -0.5,
   },
   statLabel: {
     fontFamily: F.regular,
     fontSize: 10,
-    color: C.textMuted,
+    color: 'rgba(255,255,255,0.5)',
     marginTop: 2,
   },
   contributorRow: {
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
+    borderBottomColor: 'rgba(255,255,255,0.12)',
   },
   contributorName: {
     fontFamily: F.bold,
     fontSize: 14,
-    color: C.textMain,
+    color: '#ffffff',
   },
   contributorRole: {
     fontFamily: F.regular,
     fontSize: 12,
-    color: C.textMuted,
+    color: C.yellow,
     marginTop: 2,
   },
   creditsItem: {
     fontFamily: F.regular,
     fontSize: 13,
-    color: C.textMid,
+    color: 'rgba(255,255,255,0.7)',
     lineHeight: 22,
   },
   creditsBold: {
     fontFamily: F.bold,
-    color: C.textMain,
+    color: '#ffffff',
   },
   // Info
   sectionHead: {
     fontFamily: F.bold,
-    fontSize: 11,
-    color: C.textMuted,
-    letterSpacing: 1.5,
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.4)',
+    letterSpacing: 1.8,
     marginBottom: 10,
     marginTop: 4,
+    textTransform: 'uppercase',
   },
   socialRow: {
     flexDirection: 'row',
@@ -644,22 +634,22 @@ const inner = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 11,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
+    borderBottomColor: 'rgba(255,255,255,0.12)',
   },
   socialName: {
     fontFamily: F.medium,
     fontSize: 14,
-    color: C.textMain,
+    color: '#ffffff',
   },
   socialHandle: {
     fontFamily: F.regular,
     fontSize: 13,
-    color: C.efluxBlue,
+    color: C.yellow,
   },
   newsletterCopy: {
     fontFamily: F.regular,
     fontSize: 13,
-    color: C.textMid,
+    color: 'rgba(255,255,255,0.7)',
     lineHeight: 19,
     marginBottom: 12,
   },
@@ -671,17 +661,17 @@ const inner = StyleSheet.create({
     flex: 1,
     height: 42,
     borderWidth: 1,
-    borderColor: C.border,
+    borderColor: 'rgba(255,255,255,0.25)',
     borderRadius: 3,
     paddingHorizontal: 12,
     fontFamily: F.regular,
     fontSize: 13,
-    color: C.textMain,
-    backgroundColor: C.bgMain,
+    color: '#ffffff',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   subscribeBtn: {
     height: 42,
-    backgroundColor: C.efluxBlue,
+    backgroundColor: C.yellow,
     paddingHorizontal: 16,
     borderRadius: 3,
     alignItems: 'center',
@@ -690,7 +680,7 @@ const inner = StyleSheet.create({
   subscribeBtnText: {
     fontFamily: F.bold,
     fontSize: 12,
-    color: C.white,
+    color: C.efluxBlue,
     letterSpacing: 0.3,
   },
   confirmBox: {
@@ -699,35 +689,35 @@ const inner = StyleSheet.create({
   confirmText: {
     fontFamily: F.bold,
     fontSize: 14,
-    color: C.textMain,
+    color: C.yellow,
   },
   confirmSub: {
     fontFamily: F.regular,
     fontSize: 12,
-    color: C.textMuted,
+    color: 'rgba(255,255,255,0.55)',
     marginTop: 2,
   },
   eventRow: {
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
+    borderBottomColor: 'rgba(255,255,255,0.12)',
   },
   eventTitle: {
     fontFamily: F.bold,
     fontSize: 13,
-    color: C.textMain,
+    color: '#ffffff',
     marginBottom: 2,
   },
   eventDate: {
     fontFamily: F.medium,
     fontSize: 11,
-    color: C.efluxBlue,
+    color: C.yellow,
     marginBottom: 4,
   },
   eventDesc: {
     fontFamily: F.regular,
     fontSize: 12,
-    color: C.textLight,
+    color: 'rgba(255,255,255,0.65)',
     lineHeight: 17,
   },
   footer: {
@@ -737,6 +727,6 @@ const inner = StyleSheet.create({
   footerText: {
     fontFamily: F.regular,
     fontSize: 11,
-    color: C.textMuted,
+    color: 'rgba(255,255,255,0.35)',
   },
 });
