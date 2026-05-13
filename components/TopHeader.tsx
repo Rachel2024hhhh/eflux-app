@@ -35,7 +35,7 @@ export default function TopHeader({ isOpen, onToggle }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: C.efluxBlue,
+    backgroundColor: C.yellow,
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 14,
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   wordmark: {
     fontFamily: F.bold,
     fontSize: 32,
-    color: C.yellow,
+    color: C.efluxBlue,
     letterSpacing: -0.5,
   },
   rightRow: {
@@ -60,13 +60,13 @@ const styles = StyleSheet.create({
   issue: {
     fontFamily: F.regular,
     fontSize: 10,
-    color: 'rgba(255,255,255,0.55)',
+    color: C.blueMid,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   chevron: {
     fontSize: 16,
-    color: C.yellow,
+    color: C.efluxBlue,
     lineHeight: 18,
   },
   chevronOpen: {
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   featuredLabel: {
     fontFamily: F.medium,
     fontSize: 9,
-    color: C.yellowDark,
+    color: C.blueMid,
     letterSpacing: 1.8,
     marginBottom: 4,
     textTransform: 'uppercase',
@@ -84,14 +84,14 @@ const styles = StyleSheet.create({
   featuredTitle: {
     fontFamily: F.bold,
     fontSize: 15,
-    color: '#ffffff',
+    color: C.efluxBlue,
     letterSpacing: -0.3,
     marginBottom: 4,
   },
   featuredMeta: {
     fontFamily: F.regular,
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
+    color: C.blueMid,
     lineHeight: 17,
   },
 });
