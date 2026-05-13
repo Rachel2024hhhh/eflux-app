@@ -9,22 +9,24 @@ import BottomBar from '../components/BottomBar';
 import GlassPanel from '../components/GlassPanel';
 import { ARTICLES } from '../constants/data';
 
+const T = S.topHeaderHeight; // top frame height
+const B = S.bottomBarHeight; // bottom frame height
+const STRIP = S.sideStrip;   // side strip width
+
 export default function HomeScreen() {
   const [panelOpen, setPanelOpen] = useState(false);
-  const [containerW, setContainerW] = useState(390);
-  const [headerH, setHeaderH] = useState(S.topHeaderHeight);
-
-  const W = containerW;
-  const STRIP = S.sideStrip;
+  const [W, setW] = useState(390);
+  const [H, setH] = useState(844);
 
   return (
     <SafeAreaView
       style={styles.root}
-      onLayout={e => setContainerW(e.nativeEvent.layout.width)}
+      onLayout={e => {
+        setW(e.nativeEvent.layout.width);
+        setH(e.nativeEvent.layout.height);
+      }}
     >
-      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-        <TopHeader isOpen={panelOpen} onToggle={() => setPanelOpen((v) => !v)} />
-      </View>
+      <TopHeader isOpen={panelOpen} onToggle={() => setPanelOpen((v) => !v)} />
 
       <View style={styles.body}>
         <GlassStrip side="left" />
@@ -42,19 +44,19 @@ export default function HomeScreen() {
 
       <BottomBar />
 
-      {/* Mitered corner overlay — 45° diagonal seams matching desktop polygon geometry */}
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.frameOverlay]}>
-        <Svg width={W} height={headerH}>
-          {/* Top-left: blue triangle bites into yellow header corner */}
-          <Polygon
-            points={`0,0 0,${headerH} ${STRIP},${headerH}`}
-            fill={C.efluxBlue}
-          />
+      {/* Mitered corner overlay — 45° diagonal seams matching desktop polygon geometry.
+          Top corners: blue triangles cut into the yellow header's lower-left/right corners.
+          Bottom corners: blue-on-blue, seamless (no overlay needed). */}
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        <Svg width={W} height={H}>
+          {/* Top-left: diagonal seam from (0,0) to (STRIP,T) — blue fills below */}
+          <Polygon points={`0,0 0,${T} ${STRIP},${T}`} fill={C.efluxBlue} />
           {/* Top-right: mirror */}
-          <Polygon
-            points={`${W},0 ${W},${headerH} ${W - STRIP},${headerH}`}
-            fill={C.efluxBlue}
-          />
+          <Polygon points={`${W},0 ${W},${T} ${W - STRIP},${T}`} fill={C.efluxBlue} />
+          {/* Bottom-left: diagonal seam from (0,H) to (STRIP,H-B) */}
+          <Polygon points={`0,${H} 0,${H - B} ${STRIP},${H - B}`} fill={C.efluxBlue} />
+          {/* Bottom-right: mirror */}
+          <Polygon points={`${W},${H} ${W},${H - B} ${W - STRIP},${H - B}`} fill={C.efluxBlue} />
         </Svg>
       </View>
 
@@ -77,8 +79,5 @@ const styles = StyleSheet.create({
   feed: {
     flex: 1,
     backgroundColor: '#0d0d0d',
-  },
-  frameOverlay: {
-    zIndex: 10,
   },
 });

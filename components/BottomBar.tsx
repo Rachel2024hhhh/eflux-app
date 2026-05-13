@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { C, F } from '../constants/theme';
+import { C, F, S } from '../constants/theme';
 
 const LABELS = ['Index', 'Projects', 'Artists', 'Events'];
 
@@ -24,14 +24,14 @@ export default function BottomBar() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 58,
+    height: 56,
     backgroundColor: C.efluxBlue,
   },
   row: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: S.sideStrip + 4,
   },
   tab: {
     flex: 1,
