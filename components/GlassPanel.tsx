@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   Animated,
+  Easing,
   TouchableOpacity,
   ScrollView,
   Dimensions,
@@ -255,6 +256,11 @@ export default function GlassPanel({ onClose }: Props) {
   const [activeTab, setActiveTab] = useState<'browse' | 'about' | 'info'>('browse');
   const slideAnim = useRef(new Animated.Value(-PANEL_HEIGHT)).current;
 
+  // IFLUX grow animation — matches desktop panelTextGrow keyframes:
+  // scale 1→9.5, opacity 0.2→1, cubic-bezier(0.77,0,0.175,1.1), 1.2s
+  const growScale = useRef(new Animated.Value(1)).current;
+  const growOpacity = useRef(new Animated.Value(0.2)).current;
+
   useEffect(() => {
     Animated.spring(slideAnim, {
       toValue: 0,
@@ -262,7 +268,22 @@ export default function GlassPanel({ onClose }: Props) {
       tension: 55,
       friction: 11,
     }).start();
-  }, [slideAnim]);
+
+    Animated.parallel([
+      Animated.timing(growScale, {
+        toValue: 9.5,
+        duration: 1200,
+        easing: Easing.bezier(0.77, 0, 0.175, 1.1),
+        useNativeDriver: true,
+      }),
+      Animated.timing(growOpacity, {
+        toValue: 1,
+        duration: 1200,
+        easing: Easing.bezier(0.77, 0, 0.175, 1.1),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [slideAnim, growScale, growOpacity]);
 
   const close = () => {
     Animated.timing(slideAnim, {
@@ -306,6 +327,21 @@ export default function GlassPanel({ onClose }: Props) {
     <>
       {/* Glass overlay tint */}
       <View style={[StyleSheet.absoluteFill, styles.glassTint]} pointerEvents="none" />
+
+      {/* IFLUX grow animation — matches desktop panelTextGrow: scale 1→9.5, opacity 0.2→1 */}
+      <Animated.View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, styles.growLayer]}
+      >
+        <Animated.Text
+          style={[
+            styles.growText,
+            { opacity: growOpacity, transform: [{ scale: growScale }] },
+          ]}
+        >
+          IFLUX
+        </Animated.Text>
+      </Animated.View>
 
       {/* Header */}
       <View style={styles.panelHeader}>
@@ -379,6 +415,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.55)',
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
+  },
+  growLayer: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 80,
+    overflow: 'hidden',
+  },
+  growText: {
+    fontFamily: F.display,
+    fontSize: 48,
+    color: C.yellow,
+    letterSpacing: 2,
+    lineHeight: 52,
   },
   handleArea: {
     alignItems: 'center',
