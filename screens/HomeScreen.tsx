@@ -41,7 +41,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: C.bgMain,
+    backgroundColor: '#0d0d0d',
   },
   body: {
     flex: 1,
@@ -49,6 +49,6 @@ const styles = StyleSheet.create({
   },
   feed: {
     flex: 1,
-    backgroundColor: C.bgMain,
+    backgroundColor: '#0d0d0d',
   },
 });

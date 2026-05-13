@@ -12,23 +12,21 @@ interface Props {
 
 export default function TopHeader({ isOpen, onToggle }: Props) {
   return (
-    <Pressable onPress={onToggle} style={({ pressed }) => [styles.container, pressed && { opacity: 0.85 }]}>
+    <Pressable onPress={onToggle} style={({ pressed }) => [styles.container, pressed && { opacity: 0.88 }]}>
       {/* Brand row */}
       <View style={styles.brandRow}>
-        <Text style={styles.wordmark}>e&#8209;flux</Text>
+        <Text style={styles.wordmark}>IFLUX</Text>
         <View style={styles.rightRow}>
           <Text style={styles.issue}>Spring 2026 · Issue 142</Text>
           <Text style={[styles.chevron, isOpen && styles.chevronOpen]}>▾</Text>
         </View>
       </View>
-      {/* Yellow accent bar */}
-      <View style={styles.accentBar} />
       {/* Featured teaser */}
       <View style={styles.featured}>
-        <Text style={styles.featuredLabel}>FEATURED</Text>
-        <Text style={styles.featuredTitle} numberOfLines={1}>{featured.title}</Text>
-        <Text style={styles.featuredMeta} numberOfLines={1}>
-          {featured.artist}{featured.exhibition ? ` · ${featured.exhibition}` : ''}
+        <Text style={styles.featuredLabel}>FEATURED  NOW OPEN</Text>
+        <Text style={styles.featuredTitle} numberOfLines={1}>e‑flux / Spring 2026</Text>
+        <Text style={styles.featuredMeta} numberOfLines={2}>
+          New contributions from artists, theorists, and practitioners exploring the intersection of architecture, technology, and the politics of space.
         </Text>
       </View>
     </Pressable>
@@ -37,24 +35,22 @@ export default function TopHeader({ isOpen, onToggle }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: C.bgMain,
+    backgroundColor: C.efluxBlue,
     paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: C.border,
+    paddingTop: 12,
+    paddingBottom: 14,
   },
   brandRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 7,
+    marginBottom: 10,
   },
   wordmark: {
     fontFamily: F.bold,
-    fontSize: 27,
-    color: C.efluxBlue,
-    letterSpacing: -0.6,
+    fontSize: 32,
+    color: C.yellow,
+    letterSpacing: -0.5,
   },
   rightRow: {
     flexDirection: 'row',
@@ -63,42 +59,39 @@ const styles = StyleSheet.create({
   },
   issue: {
     fontFamily: F.regular,
-    fontSize: 11,
-    color: C.textMuted,
-    letterSpacing: 0.4,
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.55)',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
   chevron: {
     fontSize: 16,
-    color: C.efluxBlue,
+    color: C.yellow,
     lineHeight: 18,
   },
   chevronOpen: {
     transform: [{ rotate: '180deg' }],
   },
-  accentBar: {
-    height: 3,
-    backgroundColor: C.yellow,
-    marginHorizontal: -16,
-    marginBottom: 9,
-  },
   featured: {},
   featuredLabel: {
     fontFamily: F.medium,
     fontSize: 9,
-    color: C.textMuted,
-    letterSpacing: 1.6,
-    marginBottom: 3,
+    color: C.yellowDark,
+    letterSpacing: 1.8,
+    marginBottom: 4,
+    textTransform: 'uppercase',
   },
   featuredTitle: {
     fontFamily: F.bold,
-    fontSize: 14,
-    color: C.textMain,
-    letterSpacing: -0.2,
+    fontSize: 15,
+    color: '#ffffff',
+    letterSpacing: -0.3,
+    marginBottom: 4,
   },
   featuredMeta: {
     fontFamily: F.regular,
     fontSize: 12,
-    color: C.textLight,
-    marginTop: 2,
+    color: 'rgba(255,255,255,0.6)',
+    lineHeight: 17,
   },
 });

@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, Text, StyleSheet } from 'react-native';
 import { C, F } from '../constants/theme';
 
 const LABELS = ['Index', 'Projects', 'Artists', 'Events'];
@@ -16,26 +15,17 @@ export default function BottomBar() {
     </View>
   );
 
-  if (Platform.OS === 'android') {
-    return (
-      <View style={[styles.container, { backgroundColor: C.bgMain }]}>
-        {content}
-      </View>
-    );
-  }
-
   return (
-    <BlurView intensity={70} tint="light" style={styles.container}>
+    <View style={styles.container}>
       {content}
-    </BlurView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     height: 58,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: C.border,
+    backgroundColor: C.efluxBlue,
   },
   row: {
     flex: 1,
@@ -51,8 +41,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: F.regular,
-    fontSize: 12,
-    color: C.textMuted,
-    letterSpacing: 0.2,
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.55)',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
 });
