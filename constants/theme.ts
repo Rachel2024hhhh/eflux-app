@@ -17,9 +17,9 @@ export const C = {
 } as const;
 
 export const S = {
-  topHeaderHeight: 44,
-  bottomBarHeight: 44,
-  sideStrip: 26,
+  topHeaderHeight: 34,
+  bottomBarHeight: 34,
+  sideStrip: 18,
   cardRadius: 3,
 } as const;
 

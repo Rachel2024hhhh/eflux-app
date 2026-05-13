@@ -30,10 +30,10 @@ const styles = StyleSheet.create({
   },
   wordmark: {
     fontFamily: F.display,
-    fontSize: 28,
+    fontSize: 20,
     color: C.panelLeftBg,
     letterSpacing: -0.5,
-    lineHeight: 32,
+    lineHeight: 24,
   },
   rightRow: {
     flexDirection: 'row',
