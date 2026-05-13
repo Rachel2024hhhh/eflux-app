@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   wordmark: {
-    fontFamily: F.bold,
-    fontSize: 32,
+    fontFamily: F.display,
+    fontSize: 34,
     color: C.efluxBlue,
     letterSpacing: -0.5,
   },

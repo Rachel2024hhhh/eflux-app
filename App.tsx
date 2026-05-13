@@ -13,6 +13,7 @@ export default function App() {
     Inter_400Regular,
     Inter_500Medium,
     Inter_700Bold,
+    RLMadena: require('./assets/fonts/RLMadena.woff'),
   });
 
   if (!fontsLoaded) {

@@ -27,4 +27,5 @@ export const F = {
   regular: 'Inter_400Regular',
   medium: 'Inter_500Medium',
   bold: 'Inter_700Bold',
+  display: 'RLMadena',
 } as const;
