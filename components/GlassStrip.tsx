@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { C } from '../constants/theme';
+import { C, S } from '../constants/theme';
 
 export default function GlassStrip({ side }: { side: 'left' | 'right' }) {
   return <View style={styles.strip} />;
@@ -8,7 +8,7 @@ export default function GlassStrip({ side }: { side: 'left' | 'right' }) {
 
 const styles = StyleSheet.create({
   strip: {
-    width: 14,
+    width: S.sideStrip,
     backgroundColor: C.efluxBlue,
   },
 });
