@@ -11,6 +11,7 @@ export interface Article {
   fullText?: string[];
   bg: string;
   accent: string;
+  image?: any;
 }
 
 export const ARTICLES: Article[] = [
@@ -29,6 +30,7 @@ export const ARTICLES: Article[] = [
     ],
     bg: '#0d0d0d',
     accent: '#cdf12b',
+    image: require('../assets/articles/1.jpg'),
   },
   {
     id: 1,
@@ -39,6 +41,7 @@ export const ARTICLES: Article[] = [
     body: 'Aperture magazine presents an issue celebrating the dynamic visions of Latinx photography throughout the United States.',
     bg: '#1a0a00',
     accent: '#f5c87a',
+    image: require('../assets/articles/2.png'),
   },
   {
     id: 9,
@@ -51,6 +54,19 @@ export const ARTICLES: Article[] = [
     body: 'Cuban artist and activist Tania Bruguera conceives a project about censorship, propaganda, and free speech — shaped by personal experiences of suppression in Cuba and beyond.',
     bg: '#0f0a0a',
     accent: '#ff6b6b',
+    image: require('../assets/articles/3.jpg'),
+  },
+  {
+    id: 10,
+    category: 'Exhibition',
+    title: 'The Plantation Plot',
+    artist: 'KADIST × ILHAM',
+    date: 'April 20, 2025',
+    exhibition: 'April 20 – September 21, 2025',
+    body: 'KADIST and ILHAM present an exhibition exploring the legacies of plantations and their (non-) logics, curated by Lim Sheau Yun. ILHAM Gallery, Kuala Lumpur.',
+    bg: '#040f0c',
+    accent: '#7fffee',
+    image: require('../assets/articles/4.jpg'),
   },
   {
     id: 2,
@@ -116,7 +132,7 @@ export const ARTICLES: Article[] = [
     accent: '#ffd966',
   },
   {
-    id: 10,
+    id: 11,
     category: 'Politics',
     title: 'Queer Phenomenology',
     artist: 'Sara Ahmed',

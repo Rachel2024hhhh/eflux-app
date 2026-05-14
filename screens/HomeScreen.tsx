@@ -5,6 +5,7 @@ import { C, S } from '../constants/theme';import TopHeader from '../components/T
 import ArticleCard from '../components/ArticleCard';
 import GlassStrip from '../components/GlassStrip';
 import BottomBar from '../components/BottomBar';
+import BottomPanel from '../components/BottomPanel';
 import GlassPanel from '../components/GlassPanel';
 import { ARTICLES } from '../constants/data';
 
@@ -14,6 +15,7 @@ const STRIP = S.sideStrip;   // side strip width
 
 export default function HomeScreen() {
   const [panelOpen, setPanelOpen] = useState(false);
+  const [bottomPanelOpen, setBottomPanelOpen] = useState(false);
   const [W, setW] = useState(390);
   const [H, setH] = useState(844);
 
@@ -35,13 +37,13 @@ export default function HomeScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {ARTICLES.map((item, index) => (
-            <ArticleCard key={`${item.id}-${index}`} item={item} />
+            <ArticleCard key={`${item.id}-${index}`} item={item} index={index} />
           ))}
         </ScrollView>
         <GlassStrip side="right" />
       </View>
 
-      <BottomBar />
+      <BottomBar isOpen={bottomPanelOpen} onToggle={() => setBottomPanelOpen(v => !v)} />
 
       {/* Mitered corner overlay — 45° diagonal seams matching desktop polygon geometry.
           Top corners: blue triangles cut into the yellow header's lower-left/right corners.
@@ -61,6 +63,10 @@ export default function HomeScreen() {
 
       {panelOpen && (
         <GlassPanel onClose={() => setPanelOpen(false)} />
+      )}
+
+      {bottomPanelOpen && (
+        <BottomPanel onClose={() => setBottomPanelOpen(false)} />
       )}
     </SafeAreaView>
   );
