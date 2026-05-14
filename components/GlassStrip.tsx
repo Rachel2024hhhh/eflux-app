@@ -1,43 +1,35 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
 import { C, F, S } from '../constants/theme';
 
-// Characters stacked vertically to spell out the ticker
-const CHARS = Array.from('E·F·L·U·X · E·F·L·U·X · ');
-const CHAR_H = 10; // height per character cell
-const SEGMENT_H = CHARS.length * CHAR_H;
-
-function TickerColumn({ side }: { side: 'left' | 'right' }) {
-  const anim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.timing(anim, {
-        toValue: -SEGMENT_H,
-        duration: 7000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    );
-    loop.start();
-    return () => loop.stop();
-  }, []);
-
-  const column = [...CHARS, ...CHARS]; // duplicate for seamless loop
-
-  return (
-    <Animated.View style={{ transform: [{ translateY: anim }] }}>
-      {column.map((ch, i) => (
-        <Text key={i} style={styles.char}>{ch}</Text>
-      ))}
-    </Animated.View>
-  );
-}
+const { height: SCREEN_H } = Dimensions.get('window');
 
 export default function GlassStrip({ side }: { side: 'left' | 'right' }) {
+  const growScale = useRef(new Animated.Value(0.08)).current;
+
+  useEffect(() => {
+    Animated.timing(growScale, {
+      toValue: 1,
+      duration: 1600,
+      easing: Easing.bezier(0.77, 0, 0.175, 1.1),
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const rotate = side === 'left' ? '-90deg' : '90deg';
+
   return (
     <View style={styles.strip}>
-      <TickerColumn side={side} />
+      <Animated.View
+        style={[
+          styles.textWrap,
+          { transform: [{ rotate }, { scaleX: growScale }] },
+        ]}
+      >
+        <Text style={styles.label} numberOfLines={1}>
+          E · F · L · U · X
+        </Text>
+      </Animated.View>
     </View>
   );
 }
@@ -48,13 +40,18 @@ const styles = StyleSheet.create({
     backgroundColor: C.panelLeftBg,
     overflow: 'hidden',
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  char: {
-    color: 'rgba(255,255,255,1)',
-    fontSize: 7,
-    fontFamily: F.medium,
-    lineHeight: CHAR_H,
+  textWrap: {
+    width: SCREEN_H * 0.85,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    fontFamily: F.display,
+    fontSize: 11,
+    color: C.yellow,
+    letterSpacing: 10,
     textAlign: 'center',
-    width: S.sideStrip,
   },
 });
