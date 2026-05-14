@@ -14,7 +14,7 @@ import { C, F, S } from '../constants/theme';
 import { SOCIAL, EVENTS } from '../constants/data';
 
 const { height: SCREEN_H } = Dimensions.get('window');
-const PANEL_H = SCREEN_H * 0.82;
+const PANEL_H = SCREEN_H;
 
 const ARCHIVE = [
   { issue: '#142', season: 'Spring 2026', theme: 'Infrastructure & Care' },
@@ -32,6 +32,10 @@ interface Props {
 export default function BottomPanel({ onClose }: Props) {
   const slideAnim = useRef(new Animated.Value(PANEL_H)).current;
 
+  // IFLUX grow animation — mirrors GlassPanel
+  const growScale   = useRef(new Animated.Value(1)).current;
+  const growOpacity = useRef(new Animated.Value(1)).current;
+
   useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: 0,
@@ -39,6 +43,21 @@ export default function BottomPanel({ onClose }: Props) {
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
+
+    Animated.parallel([
+      Animated.timing(growScale, {
+        toValue: 18,
+        duration: 1200,
+        easing: Easing.bezier(0.77, 0, 0.175, 1.1),
+        useNativeDriver: true,
+      }),
+      Animated.timing(growOpacity, {
+        toValue: 1,
+        duration: 1200,
+        easing: Easing.bezier(0.77, 0, 0.175, 1.1),
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, []);
 
   const close = () => {
@@ -54,6 +73,15 @@ export default function BottomPanel({ onClose }: Props) {
     <Animated.View
       style={[styles.panel, { transform: [{ translateY: slideAnim }] }]}
     >
+      {/* IFLUX grow watermark */}
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.growLayer]}>
+        <Animated.Text
+          style={[styles.growText, { opacity: growOpacity, transform: [{ scale: growScale }] }]}
+        >
+          IFLUX
+        </Animated.Text>
+      </Animated.View>
+
       {/* Yellow drag handle bar — tap to close */}
       <Pressable onPress={close} style={styles.handle}>
         <Text style={styles.handleLabel}>Info · Contact · Archive</Text>
@@ -345,5 +373,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: C.yellow,
     letterSpacing: -0.3,
+  },
+  growLayer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  growText: {
+    fontFamily: F.display,
+    fontSize: 72,
+    color: C.yellow,
+    letterSpacing: 2,
   },
 });

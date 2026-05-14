@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,258 +6,26 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
-  ScrollView,
   Dimensions,
   PanResponder,
-  TextInput,
-  Linking,
 } from 'react-native';
-import { C, F } from '../constants/theme';
-import {
-  NAV_CONTENT,
-  NAV_ITEMS,
-  CONTRIBUTORS,
-  SOCIAL,
-  EVENTS,
-  type NavSection,
-} from '../constants/data';
+import { C, F, S } from '../constants/theme';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const PANEL_HEIGHT = SCREEN_HEIGHT * 0.82;
+const PANEL_HEIGHT = SCREEN_HEIGHT;
+
+const NAV = ['Projects', 'Artists', 'Articles', 'Events', 'Shop'];
 
 interface Props {
   onClose: () => void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Browse (left panel content)
-// ─────────────────────────────────────────────────────────────────────────────
-function BrowseContent() {
-  const [section, setSection] = useState<NavSection>('Index');
-  const items = NAV_CONTENT[section].items;
-
-  return (
-    <View style={inner.root}>
-      {/* Section tabs */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={inner.tabScroll}
-        contentContainerStyle={inner.tabRow}
-      >
-        {NAV_ITEMS.map((s) => (
-          <TouchableOpacity
-            key={s}
-            style={[inner.sectionTab, section === s && inner.sectionTabActive]}
-            onPress={() => setSection(s)}
-            activeOpacity={0.7}
-          >
-            <Text style={[inner.sectionLabel, section === s && inner.sectionLabelActive]}>
-              {s}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Items list */}
-      <ScrollView showsVerticalScrollIndicator={false} style={inner.list}>
-        {items.map((item) => (
-          <View key={item.id} style={inner.navItem}>
-            <View style={[inner.dot, { backgroundColor: item.accent ?? C.efluxBlue }]} />
-            <View style={inner.navBody}>
-              <Text style={inner.navTitle}>{item.title}</Text>
-              <Text style={inner.navMeta}>{item.meta}</Text>
-              <Text style={inner.navBodyText}>{item.body}</Text>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// About (right panel content)
-// ─────────────────────────────────────────────────────────────────────────────
-function AboutContent() {
-  const [section, setSection] = useState<'about' | 'contributors' | 'credits'>('about');
-
-  return (
-    <View style={inner.root}>
-      {/* Section tabs */}
-      <View style={inner.tabRow}>
-        {(['about', 'contributors', 'credits'] as const).map((s) => (
-          <TouchableOpacity
-            key={s}
-            style={[inner.sectionTab, section === s && inner.sectionTabActive]}
-            onPress={() => setSection(s)}
-            activeOpacity={0.7}
-          >
-            <Text style={[inner.sectionLabel, section === s && inner.sectionLabelActive]}>
-              {s.charAt(0).toUpperCase() + s.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <ScrollView showsVerticalScrollIndicator={false} style={inner.list}>
-        {section === 'about' && (
-          <View>
-            <Text style={inner.aboutTitle}>e&#8209;flux Journal</Text>
-            <Text style={inner.aboutBody}>
-              e-flux journal is a peer-reviewed publication dedicated to contemporary art,
-              architecture, and critical theory. Founded in 1999, it has become one of the
-              most widely read publications in the international art world.
-            </Text>
-            <Text style={inner.aboutBody}>
-              Each issue features commissioned essays, artist projects, and interviews that
-              address the most pressing questions of our time. The journal is published
-              online and distributed freely to over 180,000 readers worldwide.
-            </Text>
-            <View style={inner.statRow}>
-              <View style={inner.stat}>
-                <Text style={inner.statNum}>180k+</Text>
-                <Text style={inner.statLabel}>Readers worldwide</Text>
-              </View>
-              <View style={inner.stat}>
-                <Text style={inner.statNum}>142</Text>
-                <Text style={inner.statLabel}>Issues published</Text>
-              </View>
-              <View style={inner.stat}>
-                <Text style={inner.statNum}>1999</Text>
-                <Text style={inner.statLabel}>Founded, New York</Text>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {section === 'contributors' && (
-          <View>
-            {CONTRIBUTORS.map((c) => (
-              <View key={c.name} style={inner.contributorRow}>
-                <Text style={inner.contributorName}>{c.name}</Text>
-                <Text style={inner.contributorRole}>{c.role}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {section === 'credits' && (
-          <View>
-            <Text style={inner.creditsItem}>
-              <Text style={inner.creditsBold}>Publisher: </Text>
-              e-flux, New York
-            </Text>
-            <Text style={inner.creditsItem}>
-              <Text style={inner.creditsBold}>Editor in Chief: </Text>
-              Julieta Aranda, Brian Kuan Wood, Anton Vidokle
-            </Text>
-            <Text style={inner.creditsItem}>
-              <Text style={inner.creditsBold}>Design: </Text>
-              Metahaven
-            </Text>
-            <Text style={inner.creditsItem}>
-              <Text style={inner.creditsBold}>ISSN: </Text>
-              2328-2val-0X
-            </Text>
-            <Text style={inner.creditsItem}>
-              <Text style={inner.creditsBold}>License: </Text>
-              CC BY-NC-ND 4.0
-            </Text>
-          </View>
-        )}
-      </ScrollView>
-    </View>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Info (bottom panel content)
-// ─────────────────────────────────────────────────────────────────────────────
-function InfoContent() {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  return (
-    <ScrollView showsVerticalScrollIndicator={false} style={inner.list}>
-      {/* Social */}
-      <Text style={inner.sectionHead}>Follow</Text>
-      {SOCIAL.map((s) => (
-        <TouchableOpacity
-          key={s.name}
-          style={inner.socialRow}
-          onPress={() => s.href !== '#' && Linking.openURL(s.href)}
-          activeOpacity={0.7}
-        >
-          <Text style={inner.socialName}>{s.name}</Text>
-          <Text style={inner.socialHandle}>{s.handle}</Text>
-        </TouchableOpacity>
-      ))}
-
-      {/* Newsletter */}
-      <Text style={[inner.sectionHead, { marginTop: 24 }]}>Subscribe</Text>
-      {subscribed ? (
-        <View style={inner.confirmBox}>
-          <Text style={inner.confirmText}>You're on the list.</Text>
-          <Text style={inner.confirmSub}>Expect dispatches from the edges.</Text>
-        </View>
-      ) : (
-        <View>
-          <Text style={inner.newsletterCopy}>
-            New issues, events, and critical texts — delivered direct.
-          </Text>
-          <View style={inner.inputRow}>
-            <TextInput
-              style={inner.emailInput}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="your@email.com"
-              placeholderTextColor={C.textMuted}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <TouchableOpacity
-              style={inner.subscribeBtn}
-              onPress={() => { if (email.trim()) setSubscribed(true); }}
-              activeOpacity={0.8}
-            >
-              <Text style={inner.subscribeBtnText}>Subscribe</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-
-      {/* Upcoming events */}
-      <Text style={[inner.sectionHead, { marginTop: 24 }]}>Upcoming</Text>
-      {EVENTS.map((ev) => (
-        <View key={ev.title} style={inner.eventRow}>
-          <Text style={inner.eventTitle}>{ev.title}</Text>
-          <Text style={inner.eventDate}>{ev.date}</Text>
-          <Text style={inner.eventDesc}>{ev.desc}</Text>
-        </View>
-      ))}
-
-      {/* Footer */}
-      <View style={inner.footer}>
-        <Text style={inner.footerText}>e‑flux · Founded 1999 · New York</Text>
-        <Text style={inner.footerText}>Issue 142 · Spring 2026</Text>
-      </View>
-    </ScrollView>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main GlassPanel sheet — slides DOWN from top
-// ─────────────────────────────────────────────────────────────────────────────
 export default function GlassPanel({ onClose }: Props) {
-  const [activeTab, setActiveTab] = useState<'browse' | 'about' | 'info'>('browse');
   const slideAnim = useRef(new Animated.Value(-PANEL_HEIGHT)).current;
 
-  // IFLUX grow animation — matches desktop panelTextGrow keyframes:
-  // scale 1→9.5, opacity 0.2→1, cubic-bezier(0.77,0,0.175,1.1), 1.2s
-  const growScale = useRef(new Animated.Value(1)).current;
-  const growOpacity = useRef(new Animated.Value(0.2)).current;
+  // IFLUX grow animation — matches desktop panelTextGrow keyframes
+  const growScale   = useRef(new Animated.Value(1)).current;
+  const growOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.spring(slideAnim, {
@@ -269,7 +37,7 @@ export default function GlassPanel({ onClose }: Props) {
 
     Animated.parallel([
       Animated.timing(growScale, {
-        toValue: 9.5,
+        toValue: 18,
         duration: 1200,
         easing: Easing.bezier(0.77, 0, 0.175, 1.1),
         useNativeDriver: true,
@@ -281,7 +49,7 @@ export default function GlassPanel({ onClose }: Props) {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [slideAnim, growScale, growOpacity]);
+  }, []);
 
   const close = () => {
     Animated.timing(slideAnim, {
@@ -312,80 +80,44 @@ export default function GlassPanel({ onClose }: Props) {
     })
   ).current;
 
-  const panelContent =
-    activeTab === 'browse' ? (
-      <BrowseContent />
-    ) : activeTab === 'about' ? (
-      <AboutContent />
-    ) : (
-      <InfoContent />
-    );
+  return (
+    <Animated.View style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}>
+      {/* Blue background */}
+      <View style={[StyleSheet.absoluteFill, styles.bg]} pointerEvents="none" />
 
-  const glassContent = (
-    <>
-      {/* Solid blue background */}
-      <View style={[StyleSheet.absoluteFill, styles.blueBg]} pointerEvents="none" />
-
-      {/* IFLUX grow animation — matches desktop panelTextGrow: scale 1→9.5, opacity 0.2→1 */}
-      <Animated.View
-        pointerEvents="none"
-        style={[StyleSheet.absoluteFill, styles.growLayer]}
-      >
+      {/* IFLUX grow watermark */}
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.growLayer]}>
         <Animated.Text
-          style={[
-            styles.growText,
-            { opacity: growOpacity, transform: [{ scale: growScale }] },
-          ]}
+          style={[styles.growText, { opacity: growOpacity, transform: [{ scale: growScale }] }]}
         >
           IFLUX
         </Animated.Text>
       </Animated.View>
 
-      {/* Header */}
-      <View style={styles.panelHeader}>
-        <View style={styles.tabsRow}>
-          {(['browse', 'about', 'info'] as const).map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]}
-              onPress={() => setActiveTab(tab)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabLabel, activeTab === tab && styles.tabLabelActive]}>
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <TouchableOpacity style={styles.closeBtn} onPress={close} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Text style={styles.closeText}>✕</Text>
-        </TouchableOpacity>
+      {/* Close button */}
+      <TouchableOpacity style={styles.closeBtn} onPress={close} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+        <Text style={styles.closeText}>✕</Text>
+      </TouchableOpacity>
+
+      {/* Nav headings — vertically centred */}
+      <View style={styles.navList}>
+        {NAV.map((label) => (
+          <TouchableOpacity key={label} style={styles.navItem} onPress={close} activeOpacity={0.6}>
+            <View style={styles.navRule} />
+            <Text style={styles.navLabel}>{label}</Text>
+          </TouchableOpacity>
+        ))}
+        <View style={styles.navRule} />
       </View>
 
-      {/* Content */}
-      <View style={styles.contentArea}>
-        {panelContent}
-      </View>
-
-      {/* Drag handle at bottom */}
+      {/* Drag handle */}
       <View style={styles.handleArea} {...panResponder.panHandlers}>
         <View style={styles.handle} />
       </View>
-    </>
-  );
-
-  return (
-    <Animated.View
-      style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
-    >
-      {glassContent}
     </Animated.View>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Styles
-// ─────────────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   sheet: {
     position: 'absolute',
@@ -393,340 +125,64 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: PANEL_HEIGHT,
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
     overflow: 'hidden',
     elevation: 24,
+    zIndex: 50,
   },
-  blueBg: {
+  bg: {
     backgroundColor: C.panelLeftBg,
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
   },
   growLayer: {
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 80,
+    justifyContent: 'center',
     overflow: 'hidden',
   },
   growText: {
     fontFamily: F.display,
-    fontSize: 48,
+    fontSize: 72,
     color: C.yellow,
     letterSpacing: 2,
-    lineHeight: 52,
-  },
-  handleArea: {
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: 2,
-  },
-  panelHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 0,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255,255,255,0.15)',
-  },
-  tabsRow: {
-    flexDirection: 'row',
-    gap: 4,
-    flex: 1,
-  },
-  tabBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  tabBtnActive: {
-    borderBottomColor: C.yellow,
-  },
-  tabLabel: {
-    fontFamily: F.medium,
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
-  },
-  tabLabelActive: {
-    color: C.yellow,
-    fontFamily: F.bold,
   },
   closeBtn: {
+    position: 'absolute',
+    top: 18,
+    right: 20,
+    zIndex: 10,
     padding: 4,
   },
   closeText: {
     fontFamily: F.regular,
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.6)',
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.55)',
   },
-  contentArea: {
+  navList: {
     flex: 1,
-  },
-});
-
-// Inner styles for sub-components
-const inner = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  tabScroll: {
-    flexGrow: 0,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255,255,255,0.15)',
-  },
-  tabRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 0,
-    gap: 4,
-  },
-  sectionTab: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  sectionTabActive: {
-    borderBottomColor: C.yellow,
-  },
-  sectionLabel: {
-    fontFamily: F.medium,
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.5)',
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
-  },
-  sectionLabelActive: {
-    color: C.yellow,
-    fontFamily: F.bold,
-  },
-  list: {
-    flex: 1,
-    paddingHorizontal: 18,
-    paddingTop: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+    paddingBottom: 24,
   },
   navItem: {
-    flexDirection: 'row',
+    paddingVertical: 0,
+  },
+  navRule: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  navLabel: {
+    fontFamily: F.display,
+    fontSize: 52,
+    color: C.yellow,
+    letterSpacing: -1.5,
+    lineHeight: 80,
+  },
+  handleArea: {
+    alignItems: 'center',
     paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255,255,255,0.12)',
-    gap: 12,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 6,
-  },
-  navBody: {
-    flex: 1,
-  },
-  navTitle: {
-    fontFamily: F.bold,
-    fontSize: 14,
-    color: '#ffffff',
-    letterSpacing: -0.2,
-    marginBottom: 2,
-  },
-  navMeta: {
-    fontFamily: F.regular,
-    fontSize: 11,
-    color: C.yellow,
-    letterSpacing: 0.2,
-    marginBottom: 4,
-  },
-  navBodyText: {
-    fontFamily: F.regular,
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.65)',
-    lineHeight: 18,
-  },
-  // About
-  aboutTitle: {
-    fontFamily: F.bold,
-    fontSize: 22,
-    color: '#ffffff',
-    letterSpacing: -0.5,
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  aboutBody: {
-    fontFamily: F.regular,
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.75)',
-    lineHeight: 21,
-    marginBottom: 12,
-  },
-  statRow: {
-    flexDirection: 'row',
-    gap: 0,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  stat: {
-    flex: 1,
-    paddingVertical: 12,
-    borderTopWidth: 2,
-    borderTopColor: C.yellow,
-    marginRight: 8,
-  },
-  statNum: {
-    fontFamily: F.bold,
-    fontSize: 18,
-    color: '#ffffff',
-    letterSpacing: -0.5,
-  },
-  statLabel: {
-    fontFamily: F.regular,
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
-    marginTop: 2,
-  },
-  contributorRow: {
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255,255,255,0.12)',
-  },
-  contributorName: {
-    fontFamily: F.bold,
-    fontSize: 14,
-    color: '#ffffff',
-  },
-  contributorRole: {
-    fontFamily: F.regular,
-    fontSize: 12,
-    color: C.yellow,
-    marginTop: 2,
-  },
-  creditsItem: {
-    fontFamily: F.regular,
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
-    lineHeight: 22,
-  },
-  creditsBold: {
-    fontFamily: F.bold,
-    color: '#ffffff',
-  },
-  // Info
-  sectionHead: {
-    fontFamily: F.bold,
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 1.8,
-    marginBottom: 10,
-    marginTop: 4,
-    textTransform: 'uppercase',
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 11,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255,255,255,0.12)',
-  },
-  socialName: {
-    fontFamily: F.medium,
-    fontSize: 14,
-    color: '#ffffff',
-  },
-  socialHandle: {
-    fontFamily: F.regular,
-    fontSize: 13,
-    color: C.yellow,
-  },
-  newsletterCopy: {
-    fontFamily: F.regular,
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
-    lineHeight: 19,
-    marginBottom: 12,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  emailInput: {
-    flex: 1,
-    height: 42,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-    borderRadius: 3,
-    paddingHorizontal: 12,
-    fontFamily: F.regular,
-    fontSize: 13,
-    color: '#ffffff',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  subscribeBtn: {
-    height: 42,
-    backgroundColor: C.yellow,
-    paddingHorizontal: 16,
-    borderRadius: 3,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subscribeBtnText: {
-    fontFamily: F.bold,
-    fontSize: 12,
-    color: C.efluxBlue,
-    letterSpacing: 0.3,
-  },
-  confirmBox: {
-    paddingVertical: 12,
-  },
-  confirmText: {
-    fontFamily: F.bold,
-    fontSize: 14,
-    color: C.yellow,
-  },
-  confirmSub: {
-    fontFamily: F.regular,
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.55)',
-    marginTop: 2,
-  },
-  eventRow: {
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255,255,255,0.12)',
-  },
-  eventTitle: {
-    fontFamily: F.bold,
-    fontSize: 13,
-    color: '#ffffff',
-    marginBottom: 2,
-  },
-  eventDate: {
-    fontFamily: F.medium,
-    fontSize: 11,
-    color: C.yellow,
-    marginBottom: 4,
-  },
-  eventDesc: {
-    fontFamily: F.regular,
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.65)',
-    lineHeight: 17,
-  },
-  footer: {
-    paddingVertical: 24,
-    gap: 3,
-  },
-  footerText: {
-    fontFamily: F.regular,
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.35)',
+  handle: {
+    width: 36,
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 2,
   },
 });
