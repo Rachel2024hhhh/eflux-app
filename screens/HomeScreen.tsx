@@ -41,6 +41,7 @@ export default function HomeScreen() {
         >
           <CircleTextAnimation
             text="Spring 2026"
+            height={180}
             style={styles.feedTitle}
             onDone={() => setTitleDone(true)}
           />
@@ -93,8 +94,5 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0d0d0d',
   },
-  feedTitle: {
-    height: 80,
-    backgroundColor: '#0d0d0d',
-  },
+  feedTitle: {},
 });

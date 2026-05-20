@@ -4,32 +4,42 @@ import { C, F } from '../constants/theme';
 
 interface Props {
   text: string;
+  height?: number;
   style?: ViewStyle;
   textStyle?: TextStyle;
   onDone?: () => void;
 }
 
-const RADIUS = 56;
-const SPIN_DURATION = 1300;
-const COLLAPSE_DURATION = 520;
+// Each ring: base radius, speed multiplier (negative = reverse), and opacity
+const RINGS = [
+  { radius: 30,  speed:  1.0,  alpha: 1.0  },
+  { radius: 46,  speed: -0.7,  alpha: 0.75 },
+  { radius: 62,  speed:  0.5,  alpha: 0.5  },
+  { radius: 78,  speed: -0.35, alpha: 0.3  },
+];
 
-// Easing helpers
+const SPIN_DURATION   = 1600;
+const COLLAPSE_DURATION = 560;
+const HOLD_DURATION   = 420;
+const CLOSE_DURATION  = 360;
+
 const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-const easeIn = (t: number) => t * t * t;
+const easeIn    = (t: number) => t * t * t;
 
 type Phase = 'spin' | 'collapse' | 'done';
 
-export default function CircleTextAnimation({ text, style, textStyle, onDone }: Props) {
+export default function CircleTextAnimation({ text, height = 220, style, textStyle, onDone }: Props) {
   const chars = text.split('');
   const n = chars.length;
 
-  const [frame, setFrame] = useState({ angle: 0, radius: RADIUS, opacity: 1 });
-  const phaseRef = useRef<Phase>('spin');
+  // angle = base rotation progress; expansion = ring scale (1→0 on collapse)
+  const [frame, setFrame] = useState({ angle: 0, expansion: 1, charOpacity: 1 });
+  const phaseRef      = useRef<Phase>('spin');
   const phaseStartRef = useRef<number | null>(null);
-  const rafRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
+  const rafRef        = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
 
-  // Fade-in for the h2 after animation
   const h2Opacity = useRef(new Animated.Value(0)).current;
+  const wrapHeight = useRef(new Animated.Value(height)).current;
 
   useEffect(() => {
     const loop = (ts: number) => {
@@ -38,7 +48,7 @@ export default function CircleTextAnimation({ text, style, textStyle, onDone }: 
 
       if (phaseRef.current === 'spin') {
         const t = Math.min(elapsed / SPIN_DURATION, 1);
-        setFrame({ angle: easeInOut(t) * Math.PI * 2, radius: RADIUS, opacity: 1 });
+        setFrame({ angle: easeInOut(t) * Math.PI * 2, expansion: 1, charOpacity: 1 });
         if (t >= 1) {
           phaseRef.current = 'collapse';
           phaseStartRef.current = ts;
@@ -46,16 +56,24 @@ export default function CircleTextAnimation({ text, style, textStyle, onDone }: 
       } else if (phaseRef.current === 'collapse') {
         const t = Math.min(elapsed / COLLAPSE_DURATION, 1);
         const e = easeIn(t);
-        setFrame({ angle: Math.PI * 2, radius: RADIUS * (1 - e), opacity: 1 - e });
+        setFrame({ angle: Math.PI * 2, expansion: 1 - e, charOpacity: 1 - e });
         if (t >= 1) {
           phaseRef.current = 'done';
-          // Fade h2 in
-          Animated.timing(h2Opacity, {
-            toValue: 1,
-            duration: 380,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true,
-          }).start(() => onDone?.());
+          Animated.sequence([
+            Animated.timing(h2Opacity, {
+              toValue: 1,
+              duration: 380,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: true,
+            }),
+            Animated.delay(HOLD_DURATION),
+            Animated.timing(wrapHeight, {
+              toValue: 0,
+              duration: CLOSE_DURATION,
+              easing: Easing.in(Easing.quad),
+              useNativeDriver: false,
+            }),
+          ]).start(() => onDone?.());
           return;
         }
       }
@@ -70,41 +88,43 @@ export default function CircleTextAnimation({ text, style, textStyle, onDone }: 
   }, []);
 
   const isDone = phaseRef.current === 'done';
-  const { angle, radius, opacity } = frame;
+  const { angle, expansion, charOpacity } = frame;
 
   return (
-    <View style={[styles.wrapper, style]}>
-      {/* h2 — hidden until onDone, then fades in */}
+    <Animated.View style={[styles.wrapper, style, { height: wrapHeight, overflow: 'hidden' }]}>
+      {/* h2 — hidden until collapse, then fades in */}
       <Animated.Text style={[styles.h2, textStyle, { opacity: h2Opacity }]}>
         {text}
       </Animated.Text>
 
-      {/* Spinning circle overlay */}
+      {/* Concentric spinning rings */}
       {!isDone && (
         <View style={[StyleSheet.absoluteFill, styles.circleLayer]} pointerEvents="none">
-          {chars.map((char, i) => {
-            const theta = (2 * Math.PI * i / n) - Math.PI / 2 + angle;
-            const x = radius * Math.cos(theta);
-            const y = radius * Math.sin(theta);
-            return (
-              <Text
-                key={i}
-                style={[
-                  styles.char,
-                  textStyle,
-                  {
-                    opacity,
-                    transform: [{ translateX: x }, { translateY: y }],
-                  },
-                ]}
-              >
-                {char}
-              </Text>
-            );
+          {RINGS.map((ring, ri) => {
+            const r = ring.radius * expansion;
+            const ringAngle = angle * ring.speed;
+            return chars.map((char, i) => {
+              const theta = (2 * Math.PI * i / n) - Math.PI / 2 + ringAngle;
+              const x = r * Math.cos(theta);
+              const y = r * Math.sin(theta);
+              return (
+                <Text
+                  key={`${ri}-${i}`}
+                  style={[
+                    styles.char,
+                    textStyle,
+                    { opacity: charOpacity * ring.alpha,
+                      transform: [{ translateX: x }, { translateY: y }] },
+                  ]}
+                >
+                  {char}
+                </Text>
+              );
+            });
           })}
         </View>
       )}
-    </View>
+    </Animated.View>
   );
 }
 
@@ -112,11 +132,12 @@ const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: C.panelLeftBg,
   },
   h2: {
     fontFamily: F.display,
-    fontSize: 28,
-    color: C.white,
+    fontSize: 22,
+    color: C.yellow,
     letterSpacing: -0.5,
     textAlign: 'center',
   },
@@ -127,8 +148,8 @@ const styles = StyleSheet.create({
   char: {
     position: 'absolute',
     fontFamily: F.display,
-    fontSize: 28,
+    fontSize: 11,
     color: C.yellow,
-    letterSpacing: -0.5,
+    letterSpacing: 0,
   },
 });
