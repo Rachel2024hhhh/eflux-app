@@ -12,10 +12,10 @@ interface Props {
 
 // Each ring: base radius, speed multiplier (negative = reverse), and opacity
 const RINGS = [
-  { radius: 30,  speed:  1.0,  alpha: 1.0  },
-  { radius: 46,  speed: -0.7,  alpha: 0.75 },
-  { radius: 62,  speed:  0.5,  alpha: 0.5  },
-  { radius: 78,  speed: -0.35, alpha: 0.3  },
+  { radius: 30,  speed:  1.0,  alpha: 1.0 },
+  { radius: 46,  speed: -0.7,  alpha: 1.0 },
+  { radius: 62,  speed:  0.5,  alpha: 1.0 },
+  { radius: 78,  speed: -0.35, alpha: 1.0 },
 ];
 
 const SPIN_DURATION   = 1600;
@@ -33,7 +33,7 @@ export default function CircleTextAnimation({ text, height = 220, style, textSty
   const n = chars.length;
 
   // angle = base rotation progress; expansion = ring scale (1→0 on collapse)
-  const [frame, setFrame] = useState({ angle: 0, expansion: 1, charOpacity: 1 });
+  const [frame, setFrame] = useState({ angle: 0, expansion: 1, charOpacity: 1, tangentialScale: 1 });
   const phaseRef      = useRef<Phase>('spin');
   const phaseStartRef = useRef<number | null>(null);
   const rafRef        = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
@@ -48,7 +48,7 @@ export default function CircleTextAnimation({ text, height = 220, style, textSty
 
       if (phaseRef.current === 'spin') {
         const t = Math.min(elapsed / SPIN_DURATION, 1);
-        setFrame({ angle: easeInOut(t) * Math.PI * 2, expansion: 1, charOpacity: 1 });
+        setFrame({ angle: easeInOut(t) * Math.PI * 2, expansion: 1, charOpacity: 1, tangentialScale: 1 });
         if (t >= 1) {
           phaseRef.current = 'collapse';
           phaseStartRef.current = ts;
@@ -56,7 +56,7 @@ export default function CircleTextAnimation({ text, height = 220, style, textSty
       } else if (phaseRef.current === 'collapse') {
         const t = Math.min(elapsed / COLLAPSE_DURATION, 1);
         const e = easeIn(t);
-        setFrame({ angle: Math.PI * 2, expansion: 1 - e, charOpacity: 1 - e });
+        setFrame({ angle: Math.PI * 2, expansion: 1 - e, charOpacity: 1, tangentialScale: 1 - e });
         if (t >= 1) {
           phaseRef.current = 'done';
           Animated.sequence([
@@ -88,7 +88,7 @@ export default function CircleTextAnimation({ text, height = 220, style, textSty
   }, []);
 
   const isDone = phaseRef.current === 'done';
-  const { angle, expansion, charOpacity } = frame;
+  const { angle, expansion, charOpacity, tangentialScale } = frame;
 
   return (
     <Animated.View style={[styles.wrapper, style, { height: wrapHeight, overflow: 'hidden' }]}>
@@ -107,6 +107,8 @@ export default function CircleTextAnimation({ text, height = 220, style, textSty
               const theta = (2 * Math.PI * i / n) - Math.PI / 2 + ringAngle;
               const x = r * Math.cos(theta);
               const y = r * Math.sin(theta);
+              // Chars face outward (tangential) during spin, rotate upright during collapse
+              const rot = (theta + Math.PI / 2) * tangentialScale;
               return (
                 <Text
                   key={`${ri}-${i}`}
@@ -114,7 +116,7 @@ export default function CircleTextAnimation({ text, height = 220, style, textSty
                     styles.char,
                     textStyle,
                     { opacity: charOpacity * ring.alpha,
-                      transform: [{ translateX: x }, { translateY: y }] },
+                      transform: [{ translateX: x }, { translateY: y }, { rotate: `${rot}rad` }] },
                   ]}
                 >
                   {char}

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { C, F, S } from '../constants/theme';
 import { SOCIAL, EVENTS } from '../constants/data';
+import GhostWordmark, { GHOSTS_BOTTOM } from './GhostWordmark';
 
 const { height: SCREEN_H } = Dimensions.get('window');
 const PANEL_H = SCREEN_H;
@@ -95,7 +96,10 @@ export default function BottomPanel({ onClose }: Props) {
       >
         {/* ── MASTHEAD ── */}
         <View style={styles.section}>
-          <Text style={styles.wordmark}>e‑flux</Text>
+          <View style={styles.wordmarkWrap}>
+            <Text style={styles.wordmark}>e‑flux</Text>
+            <GhostWordmark text="e‑flux" textStyle={styles.wordmark} ghosts={GHOSTS_BOTTOM} />
+          </View>
           <Text style={styles.strapline}>
             Journal of contemporary art,{'\n'}theory, and critical practice.
           </Text>
@@ -229,6 +233,9 @@ const styles = StyleSheet.create({
     letterSpacing: -2,
     lineHeight: 54,
     marginBottom: 12,
+  },
+  wordmarkWrap: {
+    position: 'relative',
   },
   strapline: {
     fontFamily: F.regular,

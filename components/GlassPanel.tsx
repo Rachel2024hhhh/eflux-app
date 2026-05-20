@@ -10,6 +10,7 @@ import {
   PanResponder,
 } from 'react-native';
 import { C, F, S } from '../constants/theme';
+import GhostWordmark from './GhostWordmark';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PANEL_HEIGHT = SCREEN_HEIGHT;
@@ -87,11 +88,14 @@ export default function GlassPanel({ onClose }: Props) {
 
       {/* IFLUX grow watermark */}
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.growLayer]}>
-        <Animated.Text
-          style={[styles.growText, { opacity: growOpacity, transform: [{ scale: growScale }] }]}
-        >
-          IFLUX
-        </Animated.Text>
+        <View style={styles.growWrap}>
+          <Animated.Text
+            style={[styles.growText, { opacity: growOpacity, transform: [{ scale: growScale }] }]}
+          >
+            IFLUX
+          </Animated.Text>
+          <GhostWordmark text="IFLUX" textStyle={styles.growText} />
+        </View>
       </Animated.View>
 
       {/* Close button */}
@@ -136,6 +140,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+  },
+  growWrap: {
+    position: 'relative',
   },
   growText: {
     fontFamily: F.display,
